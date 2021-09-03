@@ -5,7 +5,7 @@
     padding: 0.3rem;
     display: grid;
     grid-template-columns: repeat(4, var(--button-width));
-    grid-template-rows: repeat(6, var(--button-height));
+    grid-template-rows: minmax(var(--button-height), auto) repeat(5, var(--button-height));
     grid-gap: var(--grid-gap);
     grid-template-areas: 
         "screen screen screen screen"
@@ -37,20 +37,25 @@
 
 #screen {
     grid-area: screen;
+    text-align: right;
     display: flex;
     flex-direction: column;
-    justify-content: space-evenly;
-    align-items: flex-end;
+    justify-content: space-between;
     font-family: "Digital";
+    padding: 0.2rem 0 0.2rem 0;
 }
 
 #calculation {
     color: orange;
     font-size: 1.1rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 #display {
     font-size: 1.5rem;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
 }
 
 #clear {

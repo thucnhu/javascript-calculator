@@ -1,72 +1,95 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import "./App.css"
-import {  } from "./"
 
 
 export default function App() {
     const [calculation, setCalculation] = useState("")
     const [value, setValue] = useState("0")
-    const operators = ["+", "-", "/", "*"]
+    const operators = ["+", "-", "*", "/"]
+
 
     function handleClear() {
         setValue("0")
         setCalculation("")
     }
 
-    function handleClick(currVal) {
-        // handle the very first input
-        if (value === "0" && calculation === "") {
-            setValue(currVal)
-            setCalculation(currVal)
+
+    function handleNum(num) {
+        if (value === "0") {
+            setValue(num)
+
+            if (calculation === "") { // if there hasn't been any input yet
+                setCalculation(num)
+                return
+            } else { // if there has been inputs
+                setCalculation(prevCal => prevCal.substring(0, prevCal.length - 1) + num)
+                return
+            }
         }
 
-        // handle leading zeros in numbers
-        if (value === "0" && /^-?\d+$/.test(currVal)) {
-            setValue(currVal)
-            setCalculation(prevCal => (prevCal + currVal).substring(1))
+        if (operators.includes(value)) { // if the previous input was an operator
+            setValue(num)
+            setCalculation(prevCal => prevCal + num)
             return
         }
 
-        // handle multiple decimals
-        if (value === currVal === ".") return
-
-        // handle negative sign
-        if (operators.includes(value) && currVal === "-") {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal + currVal)
-            return
-        }
-
-        // handle operators
-        if (operators.includes(value) && operators.includes(currVal) && currVal !== "-") {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal.substring(0, prevCal.length - 1) + currVal)
-            return
-        } 
-
-        // handle starting new calculation after "="
         if (calculation.includes("=")) {
-            setValue(currVal)
-            setCalculation(currVal)
+            setValue(num)
+            setCalculation(num)
             return
         }
 
-        // start a new value after an operator
-        if (operators.includes(value) && /^-?\d+$/.test(currVal)) {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal + currVal)
-            return
-        }
-
-        // if new input is a number or a decimal 
-        if (/^-?\d+$/.test(currVal) || currVal === ".") {
-            setValue(prevVal => prevVal + currVal)   
-            setCalculation(prevCal => prevCal + currVal)
-        }
-        
-        setValue(currVal)   
-        setCalculation(prevCal => prevCal + currVal)
+        setValue(prevVal => prevVal + num)
+        setCalculation(prevCal => prevCal + num)
     }
+
+
+    function handleDecimal() {
+        if (operators.includes(value)) { // if the previous input was an operator
+            setValue(".")
+            setCalculation(prevCal => prevCal + ".")
+            return
+        }
+
+        if (calculation.includes("=")) { // if previous input was an equal sign
+            setValue(".")
+            setCalculation(".")
+            return
+        }
+
+        // skip if the previous input was a decimal
+        if (value.includes("."))
+            return
+
+        setValue(prevVal => prevVal + ".")
+        setCalculation(prevCal => prevCal + ".")
+    }
+
+
+    function handleOperator(operator) {
+        if (operators.includes(value)) {
+            setValue(operator)
+
+            if (operator === "-") { // handle negative sign
+                setCalculation(prevCal => prevCal + operator)
+                return
+            } else { // handle consecutive operators
+                setCalculation(prevCal => prevCal.substring(0, prevCal.length - 1) + operator)
+                return
+            }
+        }
+
+        // pressing an operator immediately following a "="
+        if (calculation.includes("=")) {
+            setCalculation(value + operator)
+            setValue(operator)
+            return
+        }
+
+        setValue(operator)
+        setCalculation(prevCal => prevCal + operator)       
+    }
+
 
     function handleEquals() {
         try {
@@ -76,7 +99,7 @@ export default function App() {
                 return
         } 
         
-        setCalculation(prevCal => setCalculation(prevCal + "=" + value))
+        setCalculation(prevCal => prevCal + "=" + eval(calculation))
     }
 
     return (
@@ -88,23 +111,23 @@ export default function App() {
 
             <div id="clear" className="button" onClick={handleClear}>AC</div>
 
-            <div onClick={() => handleClick("/")} id="divide" className="button operator">/</div>
-            <div onClick={() => handleClick("*")} id="multiply" className="button operator">x</div>
-            <div onClick={() => handleClick("-")} id="subtract" className="button operator">-</div>
-            <div onClick={() => handleClick("+")} id="add" className="button operator">+</div>
+            <div onClick={() => handleOperator("/")} id="divide" className="button operator">/</div>
+            <div onClick={() => handleOperator("*")} id="multiply" className="button operator">x</div>
+            <div onClick={() => handleOperator("-")} id="subtract" className="button operator">-</div>
+            <div onClick={() => handleOperator("+")} id="add" className="button operator">+</div>
 
-            <div onClick={() => handleClick("7")} id="seven" className="button num">7</div>
-            <div onClick={() => handleClick("8")} id="eight" className="button num">8</div>
-            <div onClick={() => handleClick("9")} id="nine" className="button num">9</div>
-            <div onClick={() => handleClick("4")} id="four" className="button num">4</div>
-            <div onClick={() => handleClick("5")} id="five" className="button num">5</div>
-            <div onClick={() => handleClick("6")} id="six" className="button num">6</div>
-            <div onClick={() => handleClick("1")} id="one" className="button num">1</div>
-            <div onClick={() => handleClick("2")} id="two" className="button num">2</div>
-            <div onClick={() => handleClick("3")} id="three" className="button num">3</div>
-            <div onClick={() => handleClick("0")} id="zero" className="button num">0</div>
+            <div onClick={() => handleNum("7")} id="seven" className="button num">7</div>
+            <div onClick={() => handleNum("8")} id="eight" className="button num">8</div>
+            <div onClick={() => handleNum("9")} id="nine" className="button num">9</div>
+            <div onClick={() => handleNum("4")} id="four" className="button num">4</div>
+            <div onClick={() => handleNum("5")} id="five" className="button num">5</div>
+            <div onClick={() => handleNum("6")} id="six" className="button num">6</div>
+            <div onClick={() => handleNum("1")} id="one" className="button num">1</div>
+            <div onClick={() => handleNum("2")} id="two" className="button num">2</div>
+            <div onClick={() => handleNum("3")} id="three" className="button num">3</div>
+            <div onClick={() => handleNum("0")} id="zero" className="button num">0</div>
 
-            <div onClick={() => handleClick(".")} id="decimal" className="button num">.</div>
+            <div onClick={handleDecimal} id="decimal" className="button num">.</div>
             <div onClick={handleEquals} id="equals" className="button">=</div>
         </div>
     )
