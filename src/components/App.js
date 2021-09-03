@@ -6,78 +6,12 @@ import {  } from "./"
 export default function App() {
     const [calculation, setCalculation] = useState("")
     const [value, setValue] = useState("0")
-    const operators = ["+", "-", "/", "*"]
 
     function handleClear() {
         setValue("0")
         setCalculation("")
     }
 
-    function handleClick(currVal) {
-        // handle the very first input
-        if (value === "0" && calculation === "") {
-            setValue(currVal)
-            setCalculation(currVal)
-        }
-
-        // handle leading zeros in numbers
-        if (value === "0" && /^-?\d+$/.test(currVal)) {
-            setValue(currVal)
-            setCalculation(prevCal => (prevCal + currVal).substring(1))
-            return
-        }
-
-        // handle multiple decimals
-        if (value === currVal === ".") return
-
-        // handle negative sign
-        if (operators.includes(value) && currVal === "-") {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal + currVal)
-            return
-        }
-
-        // handle operators
-        if (operators.includes(value) && operators.includes(currVal) && currVal !== "-") {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal.substring(0, prevCal.length - 1) + currVal)
-            return
-        } 
-
-        // handle starting new calculation after "="
-        if (calculation.includes("=")) {
-            setValue(currVal)
-            setCalculation(currVal)
-            return
-        }
-
-        // start a new value after an operator
-        if (operators.includes(value) && /^-?\d+$/.test(currVal)) {
-            setValue(currVal)
-            setCalculation(prevCal => prevCal + currVal)
-            return
-        }
-
-        // if new input is a number or a decimal 
-        if (/^-?\d+$/.test(currVal) || currVal === ".") {
-            setValue(prevVal => prevVal + currVal)   
-            setCalculation(prevCal => prevCal + currVal)
-        }
-        
-        setValue(currVal)   
-        setCalculation(prevCal => prevCal + currVal)
-    }
-
-    function handleEquals() {
-        try {
-            setValue(eval(calculation))
-        } catch (error) {
-            if (error instanceof SyntaxError)
-                return
-        } 
-        
-        setCalculation(prevCal => setCalculation(prevCal + "=" + value))
-    }
 
     return (
         <div id="calculator">
